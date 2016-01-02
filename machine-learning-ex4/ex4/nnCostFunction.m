@@ -62,7 +62,44 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+a1 = [ones(m, 1) X]; 
 
+z2 = a1 * Theta1';
+a2 = [ones(size(sigmoid(z2), 1), 1) sigmoid(z2)]; 
+
+z3 = a2 * Theta2';
+a3 = sigmoid(z3); 
+
+y_n = eye(num_labels)(y,:);
+
+reg = (sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2))) * (lambda/(2*m));
+
+J = 1/m * sum(sum(-1 * y_n .* log(a3)-(1-y_n) .* log(1-a3))) + reg;
+
+%%% Part 2 implementation
+for t = 1:m
+
+	a1 = [1; X(t,:)'];
+
+	z2 = Theta1 * a1;
+	a2 = [1; sigmoid(z2)];
+
+	z3 = Theta2 * a2;
+	a3 = sigmoid(z3);
+
+	y_y = ([1:num_labels]==y(t))';
+
+	delta_3 = a3 - y_y;
+
+	delta_2 = (Theta2' * delta_3) .* [1; sigmoidGradient(z2)];
+	delta_2 = delta_2(2:end); 
+
+	Theta1_grad = Theta1_grad + delta_2 * a1';
+	Theta2_grad = Theta2_grad + delta_3 * a2';
+end
+
+Theta1_grad = (1/m) * Theta1_grad + (lambda/m) * [zeros(size(Theta1, 1), 1) Theta1(:,2:end)];
+Theta2_grad = (1/m) * Theta2_grad + (lambda/m) * [zeros(size(Theta2, 1), 1) Theta2(:,2:end)];
 
 
 
